@@ -12,7 +12,6 @@ from FIAT.bell import Bell
 from FIAT.argyris import QuinticArgyris
 from FIAT.brezzi_douglas_marini import BrezziDouglasMarini
 from FIAT.brezzi_douglas_fortin_marini import BrezziDouglasFortinMarini
-from FIAT.Justin_brezzi_douglas_marini_cube import TrimmedBrezziDouglasMariniCubeEdge, TrimmedBrezziDouglasMariniCubeFace
 from FIAT.discontinuous_lagrange import DiscontinuousLagrange
 from FIAT.discontinuous_taylor import DiscontinuousTaylor
 from FIAT.discontinuous_raviart_thomas import DiscontinuousRaviartThomas
