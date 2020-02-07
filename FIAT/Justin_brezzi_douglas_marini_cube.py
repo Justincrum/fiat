@@ -44,7 +44,6 @@ class BrezziDouglasMariniCube(FiniteElement):
             raise Exception("BDMce_k elements only valid for dimension 2")
 
         flat_topology = flat_el.get_topology()
-
         entity_ids = {}
         cur = 0
 
@@ -52,13 +51,16 @@ class BrezziDouglasMariniCube(FiniteElement):
             entity_ids[top_dim] = {}
             for entity in entities:
                 entity_ids[top_dim][entity] = []
-
         for j in sorted(flat_topology[1]):
-            entity_ids[1][j] = list(range(cur, cur + degree + 1))
+            entity_ids[1][j] = list(range(cur, cur + degree + 1)) #assign entity ids to everything in the first dimension.
             cur = cur + degree + 1
 
-        entity_ids[2][0] = list(range(cur, cur + 2*triangular_number(degree - 1)))
+
+        entity_ids[2][0] = list(range(cur, cur + 2*triangular_number(degree - 1))) #Assigns an entity IDs to the face.  I need to figure out the pattern here for trimmed serendipity.
+        print(entity_ids)
         cur += 2*triangular_number(degree - 1)
+        print("cur is equal to")
+        print(cur)
 
         formdegree = 1
 
@@ -159,6 +161,7 @@ class BrezziDouglasMariniCube(FiniteElement):
                [(-leg(deg, x_mid)*dy[0], -leg(deg-1, x_mid)*dx[0]*dx[1]/(deg+1))] +
                [(-leg(j, x_mid)*dy[1], 0) for j in range(deg)] +
                [(-leg(deg, x_mid)*dy[1], leg(deg-1, x_mid)*dx[0]*dx[1]/(deg+1))])
+
     return EL"""
 #Splitting the E Lambda function into two seperate functions for E Lambda and E tilde Lambda.
 #Correlating with Andrew's paper, leg(j, x_mid) should be a polynomial x^i, leg(j, y_mid) should be y^i,
@@ -191,22 +194,22 @@ def determine_f_lambda_portions_2d(deg):
         DegsOfIteration = []
     else:
         DegsOfIteration = []
-        for i in range(2, deg+1):
+        for i in range(2, deg):
             DegsOfIteration += [i]
         
     return DegsOfIteration
 
 def f_lambda_1_2d_pieces(current_deg, dx, dy, x_mid, y_mid):
-   if (current_deg == 2):
+    if (current_deg == 2):
        FLpiece = [(leg(0, x_mid) * leg(0, y_mid) * dy[0] * dy[1], 0)]
-       FLpiece += [(0, leg(0, x_mid) * le(0, y_mid) * dx[0] * dx[1])]
+       FLpiece += [(0, leg(0, x_mid) * leg(0, y_mid) * dx[0] * dx[1])]
     else:
         target_power = current_deg - 2
-        FLpiece = []
+        FLpiece = tuple([])
         for j in range(0, target_power + 1):
             k = target_power - j
-            FLpiece += [(leg(j, x_mid) * leg(k, y_mid) * dy[0] * dy[1], 0)]
-            FLpiece += [(0, leg(j, x_mid) * leg(k, y_mid) * dx[0] * dx[1])]
+            FLpiece += tuple([(leg(j, x_mid) * leg(k, y_mid) * dy[0] * dy[1], 0)])
+            FLpiece += tuple([(0, leg(j, x_mid) * leg(k, y_mid) * dx[0] * dx[1])])
     return FLpiece
 
 def f_lambda_1_2d_trim(deg, dx, dy, x_mid, y_mid):
@@ -217,23 +220,21 @@ def f_lambda_1_2d_trim(deg, dx, dy, x_mid, y_mid):
     return tuple(FL)
 
 
+
 def f_lambda_1_2d(deg, dx, dy, x_mid, y_mid):
     FL = []
     for k in range(2, deg+1):
         for j in range(k-1):
             FL += [(0, leg(j, x_mid)*leg(k-2-j, y_mid)*dx[0]*dx[1])]
             FL += [(leg(k-2-j, x_mid)*leg(j, y_mid)*dy[0]*dy[1], 0)]
-
     return tuple(FL)
 
 def f_lambda_1_2d_tilde(deg, dx, dy, x_mid, y_mid):
-    FLTilde = []
-    FLTilde += [(leg(deg - 2, y_mid)*dy[0]*dy[1], 0)]
-    FLTilde += [(0, leg(deg - 2, x_mid)*dx[0]*dx[1])]
-    for k in range (2, deg - 2):
-        #FLTilde += [leg(deg - 2, y_mid)*dy[0]*dy[1], 0]
-        #FLTilde += [0, leg(deg - 2, x_mid)*dx[0]*dx[1]]
-        FLTilde += [(leg(k, x_mid) * leg(deg - k - 2, y_mid) * dy[0] * dy[1], -leg(k - 1, x_mid) * leg(deg - k - 1, y_mid) * dx[0] * dx[1])]
+    FLTilde = tuple([])
+    FLTilde += tuple([(leg(deg - 2, y_mid)*dy[0]*dy[1], 0)])
+    FLTilde += tuple([(0, leg(deg - 2, x_mid)*dx[0]*dx[1])])
+    for k in range (1, deg - 1):
+        FLTilde += tuple([(leg(k, x_mid) * leg(deg - k - 2, y_mid) * dy[0] * dy[1], -leg(k - 1, x_mid) * leg(deg - k - 1, y_mid) * dx[0] * dx[1])])
 
     return tuple(FLTilde)
 
@@ -241,6 +242,7 @@ def trimmed_f_lambda(deg, dx, dy, x_mid, y_mid):
     FL = f_lambda_1_2d_trim(deg, dx, dy, x_mid, y_mid)
     FLT = f_lambda_1_2d_tilde(deg, dx, dy, x_mid, y_mid)
     result = FL + FLT
+
     return result
 
 
@@ -325,6 +327,7 @@ class BrezziDouglasMariniCubeFace(BrezziDouglasMariniCube):
         else:
             FL = ()
         bdmcf_list = EL + FL
+        print(len(bdmcf_list))
         bdmcf_list = [[-a[1], a[0]] for a in bdmcf_list]
         self.basis = {(0, 0): Array(bdmcf_list)}
 
@@ -354,6 +357,8 @@ class TrimmedBrezziDouglasMariniCubeFace(BrezziDouglasMariniCube):
         else:
             FL = ()
         bdmcf_list = EL + FL
+        print(len(bdmcf_list))
         bdmcf_list = [[-a[1], a[0]] for a in bdmcf_list]
         self.basis = {(0, 0): Array(bdmcf_list)}
         super(TrimmedBrezziDouglasMariniCubeFace, self).__init__(ref_el=ref_el, degree=degree, mapping="contravariant piola")
+
