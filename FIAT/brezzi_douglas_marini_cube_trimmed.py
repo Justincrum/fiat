@@ -1,3 +1,22 @@
+# Copyright (C) 2019 Cyrus Cheng (Imperial College London)
+#
+# This file is part of FIAT.
+#
+# FIAT is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# FIAT is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with FIAT. If not, see <http://www.gnu.org/licenses/>.
+#
+# Modified by David A. Ham (david.ham@imperial.ac.uk), 2019
+
 from sympy import symbols, legendre, Array, diff
 import numpy as np
 from FIAT.finite_element import FiniteElement
@@ -345,3 +364,4 @@ class TrimmedBrezziDouglasMariniCubeFace(BrezziDouglasMariniCube):
         bdmcf_list = [[-a[1], a[0]] for a in bdmcf_list]
         self.basis = {(0, 0): Array(bdmcf_list)}
         super(TrimmedBrezziDouglasMariniCubeFace, self).__init__(ref_el=ref_el, degree=degree, mapping="contravariant piola")
+
