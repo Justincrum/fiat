@@ -200,14 +200,14 @@ def f_lambda_1_2d_pieces(current_deg, dx, dy, x_mid, y_mid):
    if (current_deg == 2):
        FLpiece = [(leg(0, x_mid) * leg(0, y_mid) * dy[0] * dy[1], 0)]
        FLpiece += [(0, leg(0, x_mid) * le(0, y_mid) * dx[0] * dx[1])]
-    else:
-        target_power = current_deg - 2
-        FLpiece = []
-        for j in range(0, target_power + 1):
-            k = target_power - j
-            FLpiece += [(leg(j, x_mid) * leg(k, y_mid) * dy[0] * dy[1], 0)]
-            FLpiece += [(0, leg(j, x_mid) * leg(k, y_mid) * dx[0] * dx[1])]
-    return FLpiece
+   else:
+       target_power = current_deg - 2
+       FLpiece = []
+       for j in range(0, target_power + 1):
+           k = target_power - j
+           FLpiece += [(leg(j, x_mid) * leg(k, y_mid) * dy[0] * dy[1], 0)]
+           FLpiece += [(0, leg(j, x_mid) * leg(k, y_mid) * dx[0] * dx[1])]
+   return FLpiece
 
 def f_lambda_1_2d_trim(deg, dx, dy, x_mid, y_mid):
     DegsOfIteration = determine_f_lambda_portions_2d(deg)
